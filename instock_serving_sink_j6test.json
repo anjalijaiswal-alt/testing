@@ -1,0 +1,284 @@
+{
+  "nodeId": "instock_serving_sink_j6test",
+  "definition": {
+    "type": "SPARK_JOB",
+    "schemaVersion": 1,
+    "policies": null,
+    "executionMeta": {
+      "MARKETPLACE": "HYPERLOCAL",
+      "MOVEMENT_TYPE": "HL",
+      "CURRENT_TIME": "",
+      "PIPELINE_RUN_ID": "",
+      "CURRENT_EXECUTION_ID": "",
+      "ICEBERG_WAREHOUSE_ROOT": "gs://fkp-fdp-moon-retail-engg-prod",
+      "MYSQL_HOST": "TODO_mysql_host",
+      "MYSQL_PORT": "3306",
+      "MYSQL_DB": "erp_inv_db",
+      "GRAYSKULL_AUTHN_URL": "https://service.authn-prod.fkcloud.in/",
+      "GRAYSKULL_CLIENT_ID": "TODO_set_via_azkaban_private_props",
+      "GRAYSKULL_CLIENT_SECRET": "TODO_set_via_azkaban_private_props",
+      "MYSQL_GRAYSKULL_SECRET_REF": "fk-ip-mysql:grayskull-6a4b32c2fe09769c4a202f8c",
+      "MYSQL_BATCH_SIZE": "500",
+      "ES_HOSTS": "10.116.19.183",
+      "ES_PORT": "9200",
+      "ES_INDEX_PREFIX": "instock_j6test",
+      "ES_ALIAS": "instock_j6test_current"
+    },
+    "cluster": {
+      "clusterLabels": {
+        "cluster_pool": "fkp-fdp-moon-deb12-ssmhl-pool"
+      },
+      "fallbackAllowed": true
+    },
+    "sources": [
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_rca_computation_test",
+        "destinationIndex": 1,
+        "comment": "instock_fsn_ds_sh_fact"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_rca_computation_test",
+        "destinationIndex": 2,
+        "comment": "instock_fsn_ds_fact"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_rca_computation_test",
+        "destinationIndex": 3,
+        "comment": "instock_cron_breakdown"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_rca_computation_test",
+        "destinationIndex": 4,
+        "comment": "instock_sc_breakdown"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_rca_computation_test",
+        "destinationIndex": 5,
+        "comment": "instock_stn_creation_detail"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_rca_computation_test",
+        "destinationIndex": 6,
+        "comment": "instock_inaccurate_norm_detail"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_aggregation_test",
+        "destinationIndex": 1,
+        "comment": "instock_ds_summary"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_aggregation_test",
+        "destinationIndex": 2,
+        "comment": "instock_city_summary"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_aggregation_test",
+        "destinationIndex": 3,
+        "comment": "instock_subpivot_summary"
+      },
+      {
+        "type": "NODE",
+        "policies": null,
+        "nodeName": "instock_snapshot_test",
+        "destinationIndex": 1,
+        "comment": "instock_agg_snapshot"
+      }
+    ],
+    "destinations": [
+      {
+        "type": "KRIOS_TABLE",
+        "policies": [
+          {
+            "type": "CLEAN_UP",
+            "partitionsToBeKept": 3
+          }
+        ],
+        "comment": "Hive run-log: one row per execution recording pipeline audit metadata",
+        "tableInfo": {
+          "databaseName": "rp_test",
+          "tableName": "instock_sink_run_log",
+          "partitions": [
+            {
+              "type": "KEYWORD_EXECUTION",
+              "dataType": "BIGINT",
+              "name": "refresh_id",
+              "keyword": "CURRENT_EXECUTION_ID",
+              "value": null
+            }
+          ],
+          "hdfsLocation": "gs://fkp-fdp-moon-retail-engg-prod/rp_test.db/instock_sink_run_log"
+        }
+      },
+      {
+        "type": "KRIOS_TABLE",
+        "policies": [
+          {
+            "type": "CLEAN_UP",
+            "partitionsToBeKept": 3
+          }
+        ],
+        "comment": "FSN x DS x SH RCA fact — mirrors MySQL instock_fsn_ds_sh_fact",
+        "tableInfo": {
+          "databaseName": "rp_test",
+          "tableName": "instock_serve_fsn_ds_sh_fact",
+          "partitions": [
+            {
+              "type": "KEYWORD_EXECUTION",
+              "dataType": "BIGINT",
+              "name": "refresh_id",
+              "keyword": "CURRENT_EXECUTION_ID",
+              "value": null
+            }
+          ],
+          "hdfsLocation": "gs://fkp-fdp-moon-retail-engg-prod/rp_test.db/instock_serve_fsn_ds_sh_fact"
+        }
+      },
+      {
+        "type": "KRIOS_TABLE",
+        "policies": [
+          {
+            "type": "CLEAN_UP",
+            "partitionsToBeKept": 3
+          }
+        ],
+        "comment": "Cron breakdown detail — mirrors MySQL instock_cron_breakdown",
+        "tableInfo": {
+          "databaseName": "rp_test",
+          "tableName": "instock_serve_cron_breakdown",
+          "partitions": [
+            {
+              "type": "KEYWORD_EXECUTION",
+              "dataType": "BIGINT",
+              "name": "refresh_id",
+              "keyword": "CURRENT_EXECUTION_ID",
+              "value": null
+            }
+          ],
+          "hdfsLocation": "gs://fkp-fdp-moon-retail-engg-prod/rp_test.db/instock_serve_cron_breakdown"
+        }
+      },
+      {
+        "type": "KRIOS_TABLE",
+        "policies": [
+          {
+            "type": "CLEAN_UP",
+            "partitionsToBeKept": 3
+          }
+        ],
+        "comment": "SC label breakdown detail — mirrors MySQL instock_sc_breakdown",
+        "tableInfo": {
+          "databaseName": "rp_test",
+          "tableName": "instock_serve_sc_breakdown",
+          "partitions": [
+            {
+              "type": "KEYWORD_EXECUTION",
+              "dataType": "BIGINT",
+              "name": "refresh_id",
+              "keyword": "CURRENT_EXECUTION_ID",
+              "value": null
+            }
+          ],
+          "hdfsLocation": "gs://fkp-fdp-moon-retail-engg-prod/rp_test.db/instock_serve_sc_breakdown"
+        }
+      },
+      {
+        "type": "KRIOS_TABLE",
+        "policies": [
+          {
+            "type": "CLEAN_UP",
+            "partitionsToBeKept": 3
+          }
+        ],
+        "comment": "STN creation drop-off detail — mirrors MySQL instock_stn_creation_detail",
+        "tableInfo": {
+          "databaseName": "rp_test",
+          "tableName": "instock_serve_stn_creation_detail",
+          "partitions": [
+            {
+              "type": "KEYWORD_EXECUTION",
+              "dataType": "BIGINT",
+              "name": "refresh_id",
+              "keyword": "CURRENT_EXECUTION_ID",
+              "value": null
+            }
+          ],
+          "hdfsLocation": "gs://fkp-fdp-moon-retail-engg-prod/rp_test.db/instock_serve_stn_creation_detail"
+        }
+      },
+      {
+        "type": "KRIOS_TABLE",
+        "policies": [
+          {
+            "type": "CLEAN_UP",
+            "partitionsToBeKept": 3
+          }
+        ],
+        "comment": "Inaccurate norm (MAPE) detail — mirrors MySQL instock_inaccurate_norm_detail",
+        "tableInfo": {
+          "databaseName": "rp_test",
+          "tableName": "instock_serve_inaccurate_norm_detail",
+          "partitions": [
+            {
+              "type": "KEYWORD_EXECUTION",
+              "dataType": "BIGINT",
+              "name": "refresh_id",
+              "keyword": "CURRENT_EXECUTION_ID",
+              "value": null
+            }
+          ],
+          "hdfsLocation": "gs://fkp-fdp-moon-retail-engg-prod/rp_test.db/instock_serve_inaccurate_norm_detail"
+        }
+      },
+      {
+        "type": "KRIOS_TABLE",
+        "policies": [
+          {
+            "type": "CLEAN_UP",
+            "partitionsToBeKept": 3
+          }
+        ],
+        "comment": "Flat FSN x DS denormalised fact — mirrors Elasticsearch instock_j6test_fsn_ds_flat index",
+        "tableInfo": {
+          "databaseName": "rp_test",
+          "tableName": "instock_serve_fsn_ds_flat",
+          "partitions": [
+            {
+              "type": "KEYWORD_EXECUTION",
+              "dataType": "BIGINT",
+              "name": "refresh_id",
+              "keyword": "CURRENT_EXECUTION_ID",
+              "value": null
+            }
+          ],
+          "hdfsLocation": "gs://fkp-fdp-moon-retail-engg-prod/rp_test.db/instock_serve_fsn_ds_flat"
+        }
+      }
+    ],
+    "jobClassPath": "com.flipkart.ip.pipelines.instock.driver.InstockServingSinkDriver",
+    "jarUri": "gs://fkp-fdp-moon-retail-engg-prod/share/fk-ip-requirements-compute/instock-spark-j6test.jar",
+    "sparkConfig": {
+      "spark.yarn.queue": "iwit",
+      "spark.driver.memory": "8000m",
+      "spark.executor.memory": "10000m",
+      "spark.sql.shuffle.partitions": "8"
+    }
+  }
+}
